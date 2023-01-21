@@ -1,17 +1,42 @@
-import { useState } from "react";
-const ANIMALS = ["birds", "cat", "dog", "rabbit", "reptile"];
+import { useState, useEffect } from "react";
+import Pet from "./Pet.jsx";
+
+const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
 
 const SearchParams = () => {
   // State hooks allow react to work with mutable state
-  const [location, setLocation] = useState("Phoenix, AX");
-  const [animal, setAnimal] = useState();
+  const [location, setLocation] = useState("");
+  const [animal, setAnimal] = useState("");
   const [breed, setBreed] = useState("");
-
+  const [pets, setPets] = useState([]);
   const breeds = [];
+
+  // An Effect is something that happens outside of my component
+  // They handle things that happen outside of the lifecycle of my component,
+  // like an API request, local storage, save/post to API, etc
+  // NOTE: An effect runs EVERY TIME the component is re-rendered, by default
+  // An empty dependency array runs the effect only once on creation!
+  useEffect(() => {
+    requestPets();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function requestPets() {
+    const res = await fetch(
+      `http://pets-v2.dev-apis.com/pets?animal=${animal}&location=${location}&breed=${breed}`
+    );
+    const json = await res.json();
+
+    setPets(json.pets);
+  }
 
   return (
     <div className="search-params">
-      <form>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          requestPets();
+        }}
+      >
         <label htmlFor="location">
           Location
           <input
@@ -55,6 +80,15 @@ const SearchParams = () => {
         </label>
         <button>Submit</button>
       </form>
+      {pets.map((pet) => (
+        // Key gives a unique handle per thing so that React can render more efficiently
+        <Pet
+          name={pet.name}
+          animal={pet.animal}
+          breed={pet.breed}
+          key={pet.id}
+        />
+      ))}
     </div>
   );
 };
