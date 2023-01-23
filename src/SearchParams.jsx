@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Pet from "./Pet.jsx";
+import useBreedList from "./useBreedList.js";
 
 const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
 
@@ -9,7 +10,7 @@ const SearchParams = () => {
   const [animal, setAnimal] = useState("");
   const [breed, setBreed] = useState("");
   const [pets, setPets] = useState([]);
-  const breeds = [];
+  const [breeds] = useBreedList(animal);
 
   // An Effect is something that happens outside of my component
   // They handle things that happen outside of the lifecycle of my component,
